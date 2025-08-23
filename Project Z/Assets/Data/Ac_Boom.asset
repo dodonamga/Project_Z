@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5cc4fe48ce0d064aba53065183e0220, type: 3}
+  m_Name: Ac_Boom
+  m_EditorClassIdentifier: 
+  itemType: 3
+  itemId: 0
+  itemName: Boom
+  itemDesc: "\uB370\uBBF8\uC9C0 {0}% \uC99D\uAC00"
+  itemIcon: {fileID: -1752388792, guid: b631ed305dfd43c488e0f8edf5c829bc, type: 3}
+  baseDamage: 120
+  basePenetration: 0
+  baseSpeed: 3
+  damages:
+  - 0.35
+  - 0.7
+  - 1
+  - 1.5
+  - 2.5
+  - 2.5
+  - 2.5
+  - 2.5
+  - 2.5
+  - 2.5
+  penetration: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+  speeds:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  projectile: {fileID: 8364806459011516247, guid: 02ae3d77979715d48b922921e7c0e302, type: 3}

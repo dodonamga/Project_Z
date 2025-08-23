@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5cc4fe48ce0d064aba53065183e0220, type: 3}
+  m_Name: item_PlayerMaxHP
+  m_EditorClassIdentifier: 
+  itemType: 4
+  itemId: 2
+  itemName: Max HP
+  itemDesc: "\uCD5C\uB300 \uCCB4\uB825\uC774 \n30\uC99D\uAC00\uD569\uB2C8\uB2E4."
+  itemIcon: {fileID: -1101730668, guid: b631ed305dfd43c488e0f8edf5c829bc, type: 3}
+  baseDamage: 0
+  basePenetration: 0
+  baseSpeed: 0
+  damages:
+  - 30
+  - 30
+  - 30
+  - 30
+  - 30
+  - 30
+  - 30
+  - 30
+  - 30
+  - 30
+  penetration: 
+  speeds: []
+  projectile: {fileID: 0}

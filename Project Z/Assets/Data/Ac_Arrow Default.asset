@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5cc4fe48ce0d064aba53065183e0220, type: 3}
+  m_Name: Ac_Arrow Default
+  m_EditorClassIdentifier: 
+  itemType: 0
+  itemId: 0
+  itemName: Arrow Default
+  itemDesc: "\uB370\uBBF8\uC9C0 {0}% \uC99D\uAC00\n\uAD00\uD1B5\uB825 {1} \uCD94\uAC00"
+  itemIcon: {fileID: -1011920623, guid: b631ed305dfd43c488e0f8edf5c829bc, type: 3}
+  baseDamage: 50
+  basePenetration: 1
+  baseSpeed: 15
+  damages:
+  - 0.35
+  - 0.7
+  - 1
+  - 1.5
+  - 2.5
+  - 2.5
+  - 2.5
+  - 2.5
+  - 2.5
+  - 2.5
+  penetration: 01000000010000000100000001000000010000000100000001000000010000000100000001000000
+  speeds:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  projectile: {fileID: 7405601801345251009, guid: 36e1c85d9b9365e4d84688a268222de5, type: 3}

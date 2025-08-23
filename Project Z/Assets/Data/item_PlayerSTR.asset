@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5cc4fe48ce0d064aba53065183e0220, type: 3}
+  m_Name: item_PlayerSTR
+  m_EditorClassIdentifier: 
+  itemType: 4
+  itemId: 1
+  itemName: STR
+  itemDesc: "\uBAAC\uC2A4\uD130\uB97C \uBC00\uC5B4\uB0B4\uB294 \uD798\n0.1 \uC99D\uAC00\n#\uAE30\uBCF8
+    0.5"
+  itemIcon: {fileID: 1834518398, guid: b631ed305dfd43c488e0f8edf5c829bc, type: 3}
+  baseDamage: 0
+  basePenetration: 0
+  baseSpeed: 0
+  damages:
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  penetration: 
+  speeds: []
+  projectile: {fileID: 0}
