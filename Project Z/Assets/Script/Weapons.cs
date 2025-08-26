@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Weapons : MonoBehaviour
@@ -56,5 +57,16 @@ public class Weapons : MonoBehaviour
         boom.parent = transform;
 
         boom.GetComponent<Boom>().Init(damage, speed);
+    }
+
+    public void Enemy_Fire(int index, Vector3 enemyPos, float damage)
+    {
+        Vector3 shotPos = GameManager.instance.player.transform.position;
+        Vector3 dir = (shotPos - enemyPos).normalized;
+        Transform fire = GameManager.instance.poolManager.Get(index).transform;
+        fire.position = enemyPos;
+        fire.parent = transform;
+        fire.rotation = Quaternion.LookRotation(Vector3.forward, dir);
+        fire.GetComponent<Fire>().Init(dir, damage);
     }
 }

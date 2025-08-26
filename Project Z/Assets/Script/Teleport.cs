@@ -20,6 +20,12 @@ public class Teleport : MonoBehaviour
             case TeleportType.Room0:
                 player.position = room0Tp;
                 break;
+            case TeleportType.Room1:
+                player.position = room1Tp;
+                break;
+            case TeleportType.Room2:
+                player.position = room2TP;
+                break;
         }
         
     }

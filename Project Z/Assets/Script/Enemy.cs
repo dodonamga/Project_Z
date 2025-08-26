@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
     [Header("#.. Enemy Info")]
+    public int myPrefabIndex;
     public bool isLive = true;
     public float death_Timer;
     [SerializeField] float rePos;
@@ -14,6 +16,7 @@ public class Enemy : MonoBehaviour {
     [SerializeField] float maxHealth = 100;
     [SerializeField] float reroad_DefaultAttack = 1.5f;
     [SerializeField] float timer_DefaultAttack = 0;
+    [SerializeField] float skill_0_CoolTime = 0;
 
     [Header("#.. Target information")]
     public Rigidbody2D target;
@@ -46,17 +49,34 @@ public class Enemy : MonoBehaviour {
         if (!GameManager.instance.isLive) return;
         if (!isLive || stun == true) return;
 
+        if (myPrefabIndex == 10 && skill_0_CoolTime > 10 && inAttackRange == true) {
+            skill_0_CoolTime = 0;
+            ani.SetTrigger("2_Attack");
+            Skull_Skill();
+            return;
+        }
 
-        if (inAttackRange = scanner.AttackRange() && timer_DefaultAttack > 1.5f) {
+        if (inAttackRange = scanner.AttackRange() && timer_DefaultAttack > reroad_DefaultAttack) {
             timer_DefaultAttack = 0;
             enemyAttack();
         }
 
         if (findTarget == true) {
-            EnemyMove(scanner.target.transform.position, rb.position);
+            if ((myPrefabIndex == 8 || myPrefabIndex == 10) && (inAttackRange = scanner.AttackRange()) == false) {
+                EnemyMove(scanner.target.transform.position, rb.position);
+            }
+            else if ((myPrefabIndex == 8 || myPrefabIndex == 10) && (inAttackRange = scanner.AttackRange()) == true) {
+                Debug.Log("2nd secces");
+                rb.linearVelocity = Vector3.zero;
+                ani.SetBool("1_Move", false);
+            }
+            else EnemyMove(scanner.target.transform.position, rb.position);
         }
         else if (damaged == true) {
-            if (Vector3.Distance(transform.position, arrowStartPos) < 0.7f || findTarget == true) {
+            if ((myPrefabIndex == 8 || myPrefabIndex == 10) && (Vector3.Distance(transform.position, arrowStartPos) < 0.7f || findTarget == true)) {
+                damaged = false;
+            }
+            else if (Vector3.Distance(transform.position, arrowStartPos) < 0.7f || findTarget == true) {
                 damaged = false;
             }
             EnemyMove(arrowStartPos, rb.position);
@@ -65,11 +85,17 @@ public class Enemy : MonoBehaviour {
             rb.linearVelocity = Vector3.zero;
             ani.SetBool("1_Move", false);
         }
+
+        if (findTarget == true && !(myPrefabIndex == 8 || myPrefabIndex == 10)) {
+            EnemyMove(scanner.target.transform.position, rb.position);
+        }
     }
 
     private void Update()
     {
         if (!GameManager.instance.isLive) return;
+
+        if (myPrefabIndex == 10) skill_0_CoolTime += Time.deltaTime;
 
         if (isLive != true) {
             death_Timer += Time.deltaTime;
@@ -87,7 +113,7 @@ public class Enemy : MonoBehaviour {
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //if (!collision.CompareTag("Arrow") || !collision.CompareTag("Boom") || !isLive) return;
-        if (!isLive) return;    
+        if (!isLive) return;
 
         if (collision.CompareTag("Arrow")) {
             arrowStartPos = collision.GetComponent<Arrow>().shotPos;
@@ -148,8 +174,14 @@ public class Enemy : MonoBehaviour {
 
     void enemyAttack()
     {
-        GameManager.instance.player.hp -= damage;
-        ani.SetTrigger("2_Attack");
+        if (myPrefabIndex == 8 || myPrefabIndex == 10) {
+            ani.SetTrigger("2_Attack");
+            GameManager.instance.enemy_Fire.Enemy_Fire(9, transform.position, damage);  // 9 is enemy attack prefab(Skull_M Bullet prefab)
+        }
+        else {
+            GameManager.instance.player.hp -= damage;
+            ani.SetTrigger("2_Attack");
+        }
     }
 
     void Dead()
@@ -165,7 +197,7 @@ public class Enemy : MonoBehaviour {
         GameManager.instance.player.kill += 1;
         GameManager.instance.player.exp += exp;
 
-        GetComponentInParent<Spawner>().Respawn(transform.parent, 10f);
+        GetComponentInParent<Spawner>().Respawn(transform.parent, 10f, myPrefabIndex);
 
         StartCoroutine(DisableAfterSeconds(3f));
     }
@@ -191,6 +223,13 @@ public class Enemy : MonoBehaviour {
         ani.SetBool("5_Debuff", false);
         stun = false;
         damaged = true;
+    }
+
+    void Skull_Skill()
+    {
+        Transform meteor = GameManager.instance.poolManager.Get(11).transform;  // 11 is meteor prefab
+        meteor.position = GameManager.instance.player.transform.position;
+        meteor.parent = GameManager.instance.enemy_Fire.transform;
     }
 
 }

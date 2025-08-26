@@ -19,12 +19,14 @@ public class GameManager : MonoBehaviour
     public Cuser cuser;
     public Enemy enemy;
     public Arrow arrow;
+    public Fire fire;
     public LevelUp uiLevelUp;
 
     [Header("#.. Spawner")]
     public Spawner room0Spawner;
 
     [Header("#.. Weapons")]
+    public Weapons enemy_Fire;
     public Weapons ArrowDefault;
     public Weapons ArrowBig;
     public Weapons Boom;
