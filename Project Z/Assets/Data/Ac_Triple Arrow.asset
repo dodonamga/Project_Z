@@ -16,12 +16,13 @@ MonoBehaviour:
   itemId: 0
   itemName: Triple Arrow
   itemDesc: "\uCFE8\uD0C0\uC784 {0}\uCD08 \uAC10\uC18C"
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 8130362271592694668, guid: 2b1a9f7dba1fa344db18b99f10fe4d41,
+    type: 3}
   baseDamage: 0
   basePenetration: 0
   baseSpeed: 0
   damages:
-  - 1
+  - 0
   - 1
   - 1
   - 1

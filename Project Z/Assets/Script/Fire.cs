@@ -35,7 +35,7 @@ public class Fire : MonoBehaviour
         GameManager.instance.player.hp -= damage;
         penetration--;
 
-        GameManager.instance.effect.ArrowOnEffect(collision.transform.position, 2);
+        GameManager.instance.effect.ArrowOnEffect(collision.transform.position, 0);
 
         if (penetration <= 0) {
             ResetArrow();

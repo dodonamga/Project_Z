@@ -21,16 +21,16 @@ MonoBehaviour:
   basePenetration: 0
   baseSpeed: 0
   damages:
-  - 30
-  - 30
-  - 30
-  - 30
-  - 30
-  - 30
-  - 30
-  - 30
-  - 30
-  - 30
+  - 50
+  - 50
+  - 50
+  - 50
+  - 50
+  - 50
+  - 50
+  - 50
+  - 50
+  - 50
   penetration: 
   speeds: []
   projectile: {fileID: 0}

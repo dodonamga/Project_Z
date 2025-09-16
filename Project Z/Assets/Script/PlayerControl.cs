@@ -13,6 +13,7 @@ public class PlayerControl : MonoBehaviour
     public float str = 0.5f;    // 몬스터를 밀어내는 힘
     [SerializeField] Vector2 movePos; // 입력 위치값
     public float moveSpeed = 10f; // 이동속도
+    public int healPack_Cnt = 0;
 
     [Header("#.. PlayerFlipX")]
     Vector3 cuserPoint;
@@ -21,22 +22,24 @@ public class PlayerControl : MonoBehaviour
     [Header("#.. Dash")]
     [SerializeField] float dashPower = 10f;      // 대시 속도
     [SerializeField] float dashDuration = 0.2f;  // 대시 유지 시간
-    [SerializeField] float dashCooldown = 1.0f;  // 대시 쿨타임
-    float dashTimer;
-    float dashCoolTimer;
-    bool isDashing;
-    Vector2 dashDir;
+    public float dashCooldown = 3.0f;  // 대시 쿨타임
+    [SerializeField] float dashTimer;
+    public bool isDashing;
+    [SerializeField] Vector2 dashDir;
 
     [Header("#.. Timer")]
-    [SerializeField] float timer_Home;
-    [SerializeField] float timer_defaultAttack; // reroad보다 높아야 공격 가능
-    public float reroad = 1;    // 재장전시간
-    [SerializeField] float timer_Skill0;
-    public int skill_0_CoolTime = 15;
-    [SerializeField] float timer_Skill1;
-    public int skill_1_CoolTime = 15;
-    [SerializeField] float timer_Skill2;
-    public int skill_2_CoolTime = 30;
+    public float heal_CoolDown = 1;
+    public float recoll_Home = 30;
+    public float reroad = 1;
+    public float skill_0 = 15;
+    public float skill_1 = 15;
+    public float skill_2 = 30;
+
+    [Header("Skill Condition")]
+    public bool baseAttack, can_Dash, can_Home = true;
+    public bool heal_Pack, learn_Skill0, learn_Skill1, learn_Skill2;
+    public UI_CoolTime ui_heal_pack, ba_obj, skill0, skill1, skill2, dash, home;
+
 
     Animator ani;
     Rigidbody2D rb;
@@ -50,25 +53,15 @@ public class PlayerControl : MonoBehaviour
         playerScale = transform.localScale;
     }
 
-    private void Start()
-    { 
-        hp = maxhp;
-    }
-
     private void Update()
     {
         if (!GameManager.instance.isLive) return;
-        timer_Home += Time.deltaTime;
+        if (hp < 0) Dead();
 
         levelUp();
 
         movePos.x = Input.GetAxisRaw("Horizontal");
         movePos.y = Input.GetAxisRaw("Vertical");
-
-        // ..timer
-        timer_defaultAttack += Time.deltaTime;
-        timer_Skill0 += Time.deltaTime;
-        timer_Skill1 += Time.deltaTime;
 
         // 대시 타이머 갱신
         if (isDashing) {
@@ -76,31 +69,58 @@ public class PlayerControl : MonoBehaviour
             if (dashTimer >= dashDuration) {
                 isDashing = false;
                 rb.linearVelocity = Vector2.zero;
-                dashCoolTimer = dashCooldown; // 쿨타임 시작
             }
         }
-        else if (dashCoolTimer > 0) {
-            dashCoolTimer -= Time.deltaTime;
+        if (Input.GetKeyDown(KeyCode.BackQuote)) {
+            if (heal_Pack && healPack_Cnt > 0) {
+                UsedHealPack();
+                ui_heal_pack.StartCoolTime();
+            }
+            else Debug.Log("CoolTime or not have healpack");
         }
 
-        // position to -20, 0, 0 (Start Position)
-        if (Input.GetKey(KeyCode.B) && timer_Home > 30f) {
-            Home();
+        if (Input.GetKey(KeyCode.B)) {
+            if (can_Home) {
+                Home();
+                home.StartCoolTime();
+            }
+            else Debug.Log("Home CoolTime");
         }
 
         int index;
-        if (Input.GetMouseButtonDown(0) && timer_defaultAttack >= reroad) {
-            index = 0;
-            timer_defaultAttack = 0;
-            ani.SetTrigger("2_Attack");
+        if (Input.GetMouseButtonDown(0) && GameManager.instance.isLive) {
+            if (ba_obj == null) return;
+            if (baseAttack != false) {
+                index = 0;
+                //timer_defaultAttack = 0;
+                ani.SetTrigger("2_Attack");
+                ba_obj.StartCoolTime();
+
+            } else Debug.Log("CoolTime");
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1) && timer_Skill0 >= skill_0_CoolTime && GameManager.instance.item1.level > 0) {
-            index = 0;
-            PlayerSkill0(index);
+        if (Input.GetKeyDown(KeyCode.Alpha1) && GameManager.instance.tripleArrow.level > 0) {
+            if (learn_Skill0) {
+                index = 0;
+                PlayerSkill0(index);
+                skill0.StartCoolTime();
+            }
+            else Debug.Log("Not Learn Skill 0");
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) && timer_Skill1 >= skill_1_CoolTime && GameManager.instance.item2.level > 0) {
-            index = 1;
-            PlayerSkill1(index);
+        if (Input.GetKeyDown(KeyCode.Alpha2) && GameManager.instance.Arrow_Big.level > 0) {
+            if (learn_Skill1) {
+                index = 1;
+                PlayerSkill1(index);
+                skill1.StartCoolTime();
+            }
+            else Debug.Log("Not Learn Skill 2");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3) && GameManager.instance.Boom_.level > 0) {
+            if (learn_Skill2) {
+                index = 2;
+                PlayerSkill2(index);
+                skill2.StartCoolTime();
+            }
+            else Debug.Log("Not Learn Skill 3");
         }
     }
 
@@ -116,15 +136,12 @@ public class PlayerControl : MonoBehaviour
             rb.linearVelocity = dashDir * dashPower;
         }
 
-        //Vector2 nextPos = movePos.normalized * moveSpeed * Time.fixedDeltaTime;
-        ////rb.MovePosition(nextPos + rb.position);
-        //rb.linearVelocity = nextPos * moveSpeed;
-
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing && dashCoolTimer <= 0) {
-            Dash();
-        }
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            PLayerSkill2(4);    // 4 is Boom prefab;
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing) {
+            if (can_Dash) {
+                Dash();
+                dash.StartCoolTime();
+            }
+            else Debug.Log("Dash is CoolDown");
         }
     }
 
@@ -191,14 +208,25 @@ public class PlayerControl : MonoBehaviour
     void Dash()
     {
         Vector3 curVec = GameManager.instance.cuser.GetmousePoint();
-        //rb.linearVelocity = (curVec - transform.position).normalized * 10f;
         dashDir = (curVec - transform.position).normalized;
 
         isDashing = true;
         dashTimer = 0;
-        //StartCoroutine(invincibility(0.3f));
     }
 
+    public void Dead()
+    {
+        ani.SetTrigger("4_Death");
+
+        GameManager.instance.GameOver();
+    }
+
+    void UsedHealPack()
+    {
+        healPack_Cnt--;
+        hp += maxhp * 0.8f;
+        if (hp < maxhp) hp = maxhp;
+    }
     public void DefaultAttack()
     {
         PlayerCuserFlipX();
@@ -207,13 +235,13 @@ public class PlayerControl : MonoBehaviour
 
     public void PlayerSkill0(int index)
     {
-        timer_Skill0 = 0;
+        //timer_Skill0 = 0;
         PlayerCuserFlipX();
 
         Vector3 shotPos = GameManager.instance.cuser.GetmousePoint();
         Vector3 playerPos = GameManager.instance.player.transform.position;
         Vector3 baseDir = (shotPos - playerPos).normalized;
-
+        
         float[] angles = { -10f, 0f, 10f };
 
         foreach (float angle in angles) {
@@ -225,21 +253,23 @@ public class PlayerControl : MonoBehaviour
 
     public void PlayerSkill1(int index)
     {
-        timer_Skill1 = 0;
         PlayerCuserFlipX();
         GameManager.instance.ArrowBig.ShotArrow(index);
     }
 
-    public void PLayerSkill2(int index)
+    public void PlayerSkill2(int index)
     {
-        timer_Skill2 = 0;
-
         Vector3 cuserPos = GameManager.instance.cuser.GetmousePoint();
         Vector3 dirVec = transform.position - cuserPos;
 
-        Debug.Log("cuser " + cuserPos + "\ndir " + dirVec);
-        rb.linearVelocity = Vector3.zero;
-        rb.AddForce(dirVec.normalized * 60f, ForceMode2D.Impulse);
+        float moveDistance = 1.5f; // 원하는 넉백 거리(단위: world units)
+
+        // 새 위치 계산
+        Vector3 targetPos = transform.position + dirVec.normalized * moveDistance;
+
+        // MovePosition으로 이동
+        rb.MovePosition(targetPos);
+
         StartCoroutine(invincibility(0.3f));
         GameManager.instance.Boom.Boom(index);
     }

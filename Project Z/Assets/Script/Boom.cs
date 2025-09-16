@@ -44,7 +44,7 @@ public class Boom : MonoBehaviour
     {
         coll.enabled = true;
         yield return new WaitForSeconds(0.25f);
-        GameManager.instance.effect.BoomOnEffect(transform.position, 5);
+        GameManager.instance.effect.BoomOnEffect(transform.position, 1);
         timer = 0;
         coll.enabled = false;
         transform.position = Vector3.zero;

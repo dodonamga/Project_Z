@@ -20,11 +20,6 @@ public class Arrow : MonoBehaviour {
         GameManager.instance.arrow = this;
     }
 
-    private void Update()
-    {
-        shotPos = GameManager.instance.player.transform.position;
-    }
-
     public void Init(float damage, int penetration, Vector3 dir)
     {
         this.damage = damage;
@@ -33,6 +28,11 @@ public class Arrow : MonoBehaviour {
         rb.linearVelocity = dir * arrowSpeed;
         sr.flipX = false;
 
+    }
+
+    private void OnEnable()
+    {
+        shotPos = GameManager.instance.player.transform.position;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -48,7 +48,7 @@ public class Arrow : MonoBehaviour {
         hitTargets.Add(collision);
         penetration--;
 
-        GameManager.instance.effect.ArrowOnEffect(collision.transform.position, 2);
+        GameManager.instance.effect.ArrowOnEffect(collision.transform.position, 0);
 
         if (penetration <= 0) {
             ResetArrow();

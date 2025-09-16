@@ -8,18 +8,27 @@ public class Scanner : MonoBehaviour
     [SerializeField] LayerMask targetLayer;
     public Collider2D target;
     // 공격 범위 안에 들어오면 사용할 변수
-    [SerializeField] float attackRange = 0.8f;
+    [SerializeField] float attackRange = 0.5f;
     [SerializeField] Collider2D inAttackRange;
+    public float upAddToY;
+    // Tp range
 
-    private Enemy enemy;
+    [SerializeField] float tpScanner = 0.3f;
+    [SerializeField] Collider2D canTP;
+
+
+    private BaseEnemy enemy;
     private void Awake()
     {
-        enemy = GetComponent<Enemy>();
+        enemy = GetComponent<BaseEnemy>();
     }
 
     private void FixedUpdate()
     {
-        target = Physics2D.OverlapCircle(transform.position, scanRange, targetLayer);
+        // 기준점: 현재 위치 + Y 오프셋
+        Vector3 scanOrigin = transform.position + new Vector3(0, upAddToY, 0);
+
+        target = Physics2D.OverlapCircle(scanOrigin, scanRange, targetLayer);
 
         if (target != null) {
             enemy.findTarget = true;
@@ -30,7 +39,6 @@ public class Scanner : MonoBehaviour
         }
         else {
             enemy.findTarget = false;
-            //enemy.target = null;
         }
         
     }
@@ -38,8 +46,21 @@ public class Scanner : MonoBehaviour
     // 몬스터 범위 내에 플레이어를 탐지할 로직
     public bool AttackRange()
     {
-        inAttackRange = Physics2D.OverlapCircle(transform.position, attackRange, targetLayer);
+        Vector3 scanOrigin = transform.position + new Vector3(0, upAddToY, 0);
+
+        inAttackRange = Physics2D.OverlapCircle(scanOrigin, attackRange, targetLayer);
         if (inAttackRange != null) {
+            return true;
+        }
+        return false;
+    }
+
+    public bool TpSanner()
+    {
+        Vector3 scanOrigin = transform.position + new Vector3(0, upAddToY, 0);
+
+        canTP = Physics2D.OverlapCircle(scanOrigin, tpScanner, targetLayer);
+        if (canTP != null) {
             return true;
         }
         return false;
@@ -47,12 +68,17 @@ public class Scanner : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Vector3 scanOrigin = transform.position + new Vector3(0, upAddToY, 0);
+
         // 스캔 범위
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, scanRange);
+        Gizmos.DrawWireSphere(scanOrigin, scanRange);
 
         // 공격 범위
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.DrawWireSphere(scanOrigin, attackRange);
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(scanOrigin, tpScanner);
     }
 }

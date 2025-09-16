@@ -8,6 +8,7 @@ TagManager:
   - Arrow
   - Enemy
   - Boom
+  - UI_BaseAttack
   layers:
   - Default
   - TransparentFX

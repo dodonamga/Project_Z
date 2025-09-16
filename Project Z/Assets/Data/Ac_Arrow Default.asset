@@ -21,7 +21,7 @@ MonoBehaviour:
   basePenetration: 1
   baseSpeed: 15
   damages:
-  - 0.35
+  - 0
   - 0.7
   - 1
   - 1.5
@@ -43,4 +43,5 @@ MonoBehaviour:
   - 0
   - 0
   - 0
-  projectile: {fileID: 7405601801345251009, guid: 36e1c85d9b9365e4d84688a268222de5, type: 3}
+  projectile: {fileID: 7405601801345251009, guid: 36e1c85d9b9365e4d84688a268222de5,
+    type: 3}

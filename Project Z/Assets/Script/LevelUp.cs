@@ -17,12 +17,18 @@ public class LevelUp : MonoBehaviour
         Next();
         GameManager.instance.Stop();
         rect.localScale = Vector3.one;
+
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
+        AudioManager.instance.filter(true);
     }
 
     public void Hide()
     {
         GameManager.instance.Resume();
         rect.localScale = Vector3.zero;
+
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Select);
+        AudioManager.instance.filter(false);
     }
 
     public void Select(int index)
@@ -32,42 +38,57 @@ public class LevelUp : MonoBehaviour
 
     public void Next()
     {
+        // 모든 아이템 비활성화
         foreach (Item item in items) {
             item.gameObject.SetActive(false);
         }
 
-        List<int> selectedIndexes = new List<int>();
+        int[] random = new int[3];
 
-        while (selectedIndexes.Count < 3) {
-            int index = Random.Range(0, Mathf.Min(4, items.Length)); // 0~3 기본 풀에서 선택
-            Item candidate = items[index];
+        // 0,1,2,3에서 서로 다른 3개 뽑기
+        while (true) {
+            random[0] = Random.Range(0, 4); // 0~3
+            random[1] = Random.Range(0, 4);
+            random[2] = Random.Range(0, 4);
 
-            // 만약 candidate가 만렙이라면 → 4~13 중에서 랜덤 선택
-            if (candidate.level == candidate.data.damages.Length) {
-                index = Random.Range(4, 13); // 4~13 범위
-                candidate = items[index];
-            }
-
-            // 후보도 만렙이면 → 다시 랜덤 뽑기
-            int safety = 0;
-            while (candidate.level == candidate.data.damages.Length || selectedIndexes.Contains(index)) {
-                index = Random.Range(4, Mathf.Min(13, items.Length));
-                candidate = items[index];
-                safety++;
-                if (safety > 50) break; // 무한루프 방지
-            }
-
-            // 최종 선택
-            if (!selectedIndexes.Contains(index)) {
-                selectedIndexes.Add(index);
-            }
+            if (random[0] != random[1] && random[0] != random[2] && random[1] != random[2])
+                break;
         }
 
-        // 뽑은 아이템 활성화
-        foreach (int i in selectedIndexes) {
-            items[i].gameObject.SetActive(true);
+        // 선택된 아이템 처리
+        for (int i = 0; i < random.Length; i++) {
+            int index = random[i];
+            Item selected = items[index];
+
+            // 만렙이면 다른 후보 뽑기
+            if (selected.level >= selected.data.damages.Length) {
+                List<int> candidates = new List<int>();
+
+                // 3번부터 끝까지 중에서 아직 만렙이 아닌 애들만 후보
+                for (int j = 3; j < items.Length; j++) {
+                    if (items[j].level < items[j].data.damages.Length &&
+                        System.Array.IndexOf(random, j) == -1) // 이미 뽑힌 거 제외
+                    {
+                        candidates.Add(j);
+                    }
+                }
+
+                if (candidates.Count > 0) {
+                    index = candidates[Random.Range(0, candidates.Count)];
+                }
+                else {
+                    // 대체할 아이템이 아예 없는 경우 (모두 만렙)
+                    index = -1;
+                }
+            }
+
+            if (index != -1) {
+                items[index].gameObject.SetActive(true);
+                random[i] = index; // 뽑힌 값 갱신
+            }
         }
     }
+
 
 
     //public void Next()

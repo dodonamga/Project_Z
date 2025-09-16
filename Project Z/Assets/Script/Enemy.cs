@@ -17,6 +17,8 @@ public class Enemy : MonoBehaviour {
     [SerializeField] float reroad_DefaultAttack = 1.5f;
     [SerializeField] float timer_DefaultAttack = 0;
     [SerializeField] float skill_0_CoolTime = 0;
+    [SerializeField] float skill_1_CoolTime = 0;
+    bool canTP;
 
     [Header("#.. Target information")]
     public Rigidbody2D target;
@@ -49,20 +51,31 @@ public class Enemy : MonoBehaviour {
         if (!GameManager.instance.isLive) return;
         if (!isLive || stun == true) return;
 
-        if (myPrefabIndex == 10 && skill_0_CoolTime > 10 && inAttackRange == true) {
+        if ((myPrefabIndex == 10 && skill_0_CoolTime > 10 && inAttackRange == true && timer_DefaultAttack > reroad_DefaultAttack) 
+            || (myPrefabIndex == 15 && skill_0_CoolTime > 10 && (canTP = scanner.TpSanner()) == true && timer_DefaultAttack > reroad_DefaultAttack) ) {
+            timer_DefaultAttack = -3;
             skill_0_CoolTime = 0;
             ani.SetTrigger("2_Attack");
             Skull_Skill();
             return;
         }
-
-        if (inAttackRange = scanner.AttackRange() && timer_DefaultAttack > reroad_DefaultAttack) {
-            timer_DefaultAttack = 0;
-            enemyAttack();
+        if ((canTP = scanner.TpSanner()) == true && (myPrefabIndex == 13 || myPrefabIndex == 14 || myPrefabIndex == 15) 
+            && skill_1_CoolTime > 10 && timer_DefaultAttack > reroad_DefaultAttack) {
+            timer_DefaultAttack = -3;
+            stun = true;
+            skill_1_CoolTime = 0;
+            ani.SetBool("1_Move", false);
+            Tp_Skill();
+            return;
         }
 
+        //if (inAttackRange = scanner.AttackRange() && timer_DefaultAttack > reroad_DefaultAttack) {
+        //    timer_DefaultAttack = 0;
+        //    enemyAttack();
+        //}
+
         if (findTarget == true) {
-            if ((myPrefabIndex == 8 || myPrefabIndex == 10) && (inAttackRange = scanner.AttackRange()) == false) {
+            if ((myPrefabIndex == 8 || myPrefabIndex == 10 ) && (inAttackRange = scanner.AttackRange()) == false) {
                 EnemyMove(scanner.target.transform.position, rb.position);
             }
             else if ((myPrefabIndex == 8 || myPrefabIndex == 10) && (inAttackRange = scanner.AttackRange()) == true) {
@@ -95,7 +108,8 @@ public class Enemy : MonoBehaviour {
     {
         if (!GameManager.instance.isLive) return;
 
-        if (myPrefabIndex == 10) skill_0_CoolTime += Time.deltaTime;
+        if (myPrefabIndex == 10 || myPrefabIndex == 15) skill_0_CoolTime += Time.deltaTime;
+        if (myPrefabIndex == 13 || myPrefabIndex == 14 || myPrefabIndex == 15) skill_1_CoolTime += Time.deltaTime;
 
         if (isLive != true) {
             death_Timer += Time.deltaTime;
@@ -139,6 +153,16 @@ public class Enemy : MonoBehaviour {
         health = maxHealth;
         isLive = true;
         damaged = false;
+        if (myPrefabIndex == 6 || myPrefabIndex == 7) {
+            enemyScale = new Vector3(-1, 1, 0);
+            transform.localScale = enemyScale;
+        }else if(myPrefabIndex == 14) {
+            enemyScale = new Vector3(-1f, 1f, 0);
+            transform.localScale = enemyScale;
+        }else if(myPrefabIndex == 15){
+            enemyScale = new Vector3(-1f, 1f, 0);
+            transform.localScale = enemyScale;
+        }
     }
 
     public void Init(float up)
@@ -227,9 +251,27 @@ public class Enemy : MonoBehaviour {
 
     void Skull_Skill()
     {
-        Transform meteor = GameManager.instance.poolManager.Get(11).transform;  // 11 is meteor prefab
+        Transform meteor = GameManager.instance.poolManager.Get(PoolManager.PoolType.Effect, 2).transform;  // 11 is meteor prefab
         meteor.position = GameManager.instance.player.transform.position;
         meteor.parent = GameManager.instance.enemy_Fire.transform;
     }
 
+    void Tp_Skill()
+    {
+        Transform tp = GameManager.instance.poolManager.Get(PoolManager.PoolType.Effect, 2).transform;
+        tp.position = GameManager.instance.player.transform.position +
+            (GameManager.instance.player.transform.position - transform.position).normalized * 2f;
+        tp.parent = GameManager.instance.enemy_Fire.transform;
+
+        Animator ani = tp.GetComponent<Animator>();
+        ani.SetTrigger("TP");
+        stun = false;
+        StartCoroutine(TP(tp));
+    }
+    IEnumerator TP(Transform tp)
+    {
+        yield return new WaitForSeconds(1.5f);
+        transform.position = tp.position;
+        tp.gameObject.SetActive(false);
+    }
 }

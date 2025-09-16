@@ -3,8 +3,17 @@ using UnityEngine.UI;
 
 public class HUD : MonoBehaviour
 {
-    public enum InfoType { Exp, level, Kill, Time, Health }
+    enum BossName { Boss, Boss1, Boss2, Boss3 };
+    public int roomNum;
+
+    public enum InfoType { Exp, level, Kill, Time, Health, Enemy_Health, Boss_Health }
     public InfoType type;
+
+    public GameObject[] boss0 = new GameObject[4];
+
+
+    public float boss_curHealth;
+    public float boss_maxHealth;
 
     Text myText;
     Slider mySlider;
@@ -42,8 +51,35 @@ public class HUD : MonoBehaviour
                 float maxHealth = GameManager.instance.player.maxhp;
                 mySlider.value = curHealth / maxHealth;
                 break;
+            case InfoType.Enemy_Health:
+                BaseEnemy be = transform.parent.parent.parent.Find("UnitRoot").GetComponent<BaseEnemy>();
+                float E_curHealth = be.health;
+                float E_maxHealth = be.maxHealth;
+                mySlider.value = E_curHealth / E_maxHealth;
+                break;
+            case InfoType.Boss_Health:
+                //GameObject go = FindGameObject(roomNum);
+                //if (go == null) return;
+                //boss_curHealth = go.GetComponent<BaseEnemy>().health;
+                //boss_maxHealth = go.GetComponent<BaseEnemy>().maxHealth;
+                for (int index = 0; index < boss0.Length; index++) {
+                    if (index == roomNum) {
+                        boss_curHealth = boss0[index].GetComponentInChildren<BaseEnemy>().health;
+                        boss_maxHealth = boss0[index].GetComponentInChildren<BaseEnemy>().maxHealth;
+                        mySlider.value = boss_curHealth / boss_maxHealth;
+                    }
+                }
 
+                //mySlider.value = boss_curHealth / boss_maxHealth;
+                break;
         }
+    }
+    public GameObject FindGameObject(int roomNum)
+    {
+        if (roomNum == -1) return null;
+        string name = ((BossName)roomNum).ToString();
+        GameObject boss = GameObject.Find(name);
+        return boss;
     }
 }
 

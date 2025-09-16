@@ -72,7 +72,7 @@ public class Item : MonoBehaviour {
                 if (data.itemId == 0) {
                     textDesc.text = string.Format(data.itemDesc, data.damages[level] * 100);
                 }
-                else if (data.itemId == 1 || data.itemId == 2) {
+                else if (data.itemId == 1 || data.itemId == 2 || data.itemId == 4 || data.itemId == 5) {
                     textDesc.text = string.Format(data.itemDesc, data.damages);
                 }
                 else if (data.itemId == 3) {
@@ -107,6 +107,8 @@ public class Item : MonoBehaviour {
                     weapons.Init(data);
 
                     GameManager.instance.ArrowBig = weapons;
+                    GameManager.instance.player.learn_Skill1 = true;
+                    GameManager.instance.player.skill1.disable.fillAmount = 0;
                 }
                 else if (level > 0 && data.itemId == 0) {
                     GameManager.instance.ArrowBig.damage += data.baseDamage * data.damages[level];
@@ -121,7 +123,11 @@ public class Item : MonoBehaviour {
                 }
                 break;
             case WeaponsData.Itemtype.TripleArrow:
-                GameManager.instance.player.skill_0_CoolTime -= data.penetration[level];
+                if (level == 0 && data.itemId == 0) {
+                    GameManager.instance.player.skill0.disable.fillAmount = 0;
+                    GameManager.instance.player.learn_Skill0 = true;
+                }
+                GameManager.instance.player.skill_0 -= data.penetration[level];
                 break;
             case WeaponsData.Itemtype.Boom:
                 if (level == 0 && data.itemId == 0) {
@@ -131,6 +137,8 @@ public class Item : MonoBehaviour {
                     weapons.Init(data);
 
                     GameManager.instance.Boom = weapons;
+                    GameManager.instance.player.learn_Skill2 = true;
+                    GameManager.instance.player.skill2.disable.fillAmount = 0;
                 }
                 else if (level > 0 && data.itemId == 0){
                     GameManager.instance.Boom.damage += data.baseDamage * data.damages[level];
@@ -139,7 +147,7 @@ public class Item : MonoBehaviour {
                     GameManager.instance.Boom.damage += data.baseDamage * data.damages[level];
                 }
                 else if (data.itemId == 2) {
-                    GameManager.instance.player.skill_2_CoolTime -= (int)data.damages[level];
+                    GameManager.instance.player.skill_2 -= (int)data.damages[level];
                 } else if (data.itemId == 3) {
                     GameManager.instance.Boom.speed -= (int)data.damages[level];
                 }
@@ -156,7 +164,16 @@ public class Item : MonoBehaviour {
                     GameManager.instance.player.maxhp += data.damages[level];
                 }
                 else if (data.itemId == 3) {
-                    GameManager.instance.player.reroad -= data.speeds[level];
+                    GameManager.instance.player.reroad -= data.damages[level];
+                }
+                else if (data.itemId == 4) {
+                    GameManager.instance.player.dashCooldown -= data.damages[level];
+                }
+                else if (data.itemId == 5) {
+                    if (level == 0) GameManager.instance.player.ui_heal_pack.disable.fillAmount = 0;
+                    GameManager.instance.player.healPack_Cnt++;
+                    GameManager.instance.player.heal_Pack = true;
+                    GameManager.instance.player.ui_heal_pack.UpdateCoolTime();
                 }
                 break;
 

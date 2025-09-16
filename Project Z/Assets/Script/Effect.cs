@@ -16,11 +16,11 @@ public class Effect : MonoBehaviour {
 
     public void OnEffectAni(Vector3 effectPos, int index)
     {
-        GameObject effect = GameManager.instance.poolManager.Get(index);
+        GameObject effect = GameManager.instance.poolManager.Get(PoolManager.PoolType.Effect, index);
         effect.transform.position = effectPos;
         effect.transform.parent = transform;
         Animator animator = effect.GetComponent<Animator>();
-        if (index == 2) {
+        if (index == 0) {
             animator.SetTrigger("isHit");
         }
         else {
